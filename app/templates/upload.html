@@ -54,10 +54,10 @@
                 <div id="color" class="tab-pane active">
                     <!-- Color Analysis -->
                     <h4>Image Analysis - Step 1: Color Analysis</h4>
-                    <div class="palette">
+                    <div class="palette" style="height: 150px; display: flex; flex-direction: row;">
                         {% set total = image_properties|sum(attribute='fraction') %}
                         {% for color_info in image_properties %}
-                        <div style="background-color: {{ color_info.color }}; height: 20px; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
+                        <div style="background-color: {{ color_info.color }}; height: 150px; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
                         {% endfor %}
                     </div>
                 </div>
