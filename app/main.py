@@ -3,6 +3,8 @@ from app import app
 from flask import flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 
+from detect_text import analyze_image_properties
+
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
@@ -39,6 +41,8 @@ def upload_image():
             {'color': 'rgb(0,255,0)', 'fraction': 0.25},
             {'color': 'rgb(0,0,255)', 'fraction': 0.5},
         ]
+
+        image_properties = analyze_image_properties(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         return render_template("upload.html", filename=filename, image_properties=image_properties)
     else:

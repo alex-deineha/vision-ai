@@ -30,20 +30,32 @@ def analyze_image_properties(path):
 
     response = client.image_properties(image=image)
     props = response.image_properties_annotation
-    print('Properties of the image:')
 
-    for color in props.dominant_colors.colors:
-        print('Fraction: {}'.format(color.pixel_fraction))
-        print('\tR: {}'.format(color.color.red))
-        print('\tG: {}'.format(color.color.green))
-        print('\tB: {}'.format(color.color.blue))
-        print('\tAlpha: {}'.format(color.color.alpha))
+    # Prepare image properties for HTML
+    image_properties = []
+    for color_info in props.dominant_colors.colors:
+        r, g, b = color_info.color.red, color_info.color.green, color_info.color.blue
+        fraction = color_info.pixel_fraction
+        color = f'rgb({r},{g},{b})'
+        image_properties.append({'color': color, 'fraction': fraction})
 
-    if response.error.message:
-        raise Exception(
-            "{}\nFor more info on error messages, check: "
-            "https://cloud.google.com/apis/design/errors".format(response.error.message)
-        )
+    return image_properties
+
+
+    # print('Properties of the image:')
+    #
+    # for color in props.dominant_colors.colors:
+    #     print('Fraction: {}'.format(color.pixel_fraction))
+    #     print('\tR: {}'.format(color.color.red))
+    #     print('\tG: {}'.format(color.color.green))
+    #     print('\tB: {}'.format(color.color.blue))
+    #     print('\tAlpha: {}'.format(color.color.alpha))
+    #
+    # if response.error.message:
+    #     raise Exception(
+    #         "{}\nFor more info on error messages, check: "
+    #         "https://cloud.google.com/apis/design/errors".format(response.error.message)
+    #     )
 
 
 def detect_text(path):
