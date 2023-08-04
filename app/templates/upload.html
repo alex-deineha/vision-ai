@@ -6,98 +6,12 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background-color: #f3f3f3;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-        }
-        .preview {
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-        }
-        .preview img {
-            max-height: 300px;
-        }
-        .palette {
-            display: flex;
-            height: 50px;
-            margin-top: 10px;
-        }
-        .palette div {
-            height: 50px;
-        }
-        .label-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .label-description {
-            flex: 3;
-            padding-right: 10px;
-        }
-        .score-bar {
-            flex: 7;
-            background-color: #ddd;  /* Bar background color */
-            height: 10px;  /* Adjust the height as needed */
-            overflow: hidden;
-        }
-        .score-bar div {
-            height: 10px;  /* Match height of score bar */
-            background-color: #4CAF50;  /* Fill color */
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
         <h2>Select an image to upload and display</h2>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="alert alert-info" role="alert">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        {% if filename %}
-            <div class="preview">
-                <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
-            </div>
-            <!-- Image Analysis - Step 1: Color Analysis -->
-            <h4>Image Analysis - Step 1: Color Analysis</h4>
-            <div class="palette">
-                {% set total = image_properties|sum(attribute='fraction') %}
-                {% for color_info in image_properties %}
-                    <div style="background-color: {{ color_info.color }}; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
-                {% endfor %}
-            </div>
 
-            <!-- Image Analysis - Step 2: Text Annotations -->
-            <h4>Image Analysis - Step 2: Text Annotations</h4>
-            <div class="preview">
-                {% if annotated_filename %}
-                    <img src="{{ url_for('display_image', filename=annotated_filename) }}" class="img-thumbnail">
-                {% endif %}
-            </div>
-
-            <!-- Image Analysis - Step 3: Label Detection -->
-            <h4>Image Analysis - Step 3: Label Detection</h4>
-            <div>
-                {% for label in labels %}
-                    <p>{{ label.description }}</p>
-                    <div class="score-bar">
-                        <div style="width: {{ label.score * 100 }}%;"></div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
         <form method="post" action="/" enctype="multipart/form-data">
             <div class="form-group">
                 <input type="file" name="file" class="form-control-file" autocomplete="off" required>
@@ -106,10 +20,64 @@
                 <input type="submit" value="Submit" class="btn btn-primary">
             </div>
         </form>
+
+        {% if filename %}
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
+                </div>
+                <div class="col-md-6">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="color-tab" data-toggle="tab" href="#color">Color Analysis</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="annotate-tab" data-toggle="tab" href="#annotate">Annotated Image</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="labels-tab" data-toggle="tab" href="#labels">Image Labels</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div id="color" class="tab-pane active">
+                            <!-- Color Analysis -->
+                            <h4>Image Analysis - Step 1: Color Analysis</h4>
+                            <div class="palette">
+                                {% set total = image_properties|sum(attribute='fraction') %}
+                                {% for color_info in image_properties %}
+                                    <div style="background-color: {{ color_info.color }}; height: 20px; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div id="annotate" class="tab-pane">
+                            <!-- Annotated Image -->
+                            <h4>Image Analysis - Step 2: Annotated Image</h4>
+                            <img src="{{ url_for('static', filename='uploads/output.png') }}" class="img-thumbnail">
+                        </div>
+                        <div id="labels" class="tab-pane">
+                            <!-- Image Labels -->
+                            <h4>Image Analysis - Step 3: Image Labels</h4>
+                            {% for label in labels %}
+                                <div class="label-item">
+                                    <span class="label-description">{{ label.description }}</span>
+                                    <div class="score-bar">
+                                        <div style="background-color: green; height: 10px; width: {{ label.score * 100 }}%;"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Bootstrap JS and jQuery -->
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
