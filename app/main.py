@@ -1,19 +1,15 @@
 import os
-from app import app
 from flask import flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 
-from detect_text import analyze_image_properties, detect_text, detect_labels
+from app import app
+from utils import detect_properties, detect_text, detect_labels
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
 def allowed_file(filename):
-    return "." in filename and extension(filename) in ALLOWED_EXTENSIONS
-
-
-def extension(filename):
-    return filename.rsplit(".", 1)[1].lower()
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route("/")
@@ -26,28 +22,32 @@ def upload_image():
     if "file" not in request.files:
         flash("No file part")
         return redirect(request.url)
-    file = request.files["file"]
-    if file.filename == "":
+
+    uploaded_file = request.files["file"]
+
+    if uploaded_file.filename == "":
         flash("No image selected for uploading")
         return redirect(request.url)
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        # print('upload_image filename: ' + filename)
+
+    if uploaded_file and allowed_file(uploaded_file.filename):
+        # filename = secure_filename(uploaded_file.filename)
+        filename = "input"
+        image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+        uploaded_file.save(image_path)
         flash("Image successfully uploaded and displayed below")
 
-        detect_text(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        detect_text(image_path)
+        image_properties = detect_properties(image_path)
+        labels = detect_labels(image_path)
 
-        image_properties = analyze_image_properties(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-
-        labels = detect_labels(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-
-        print(filename)
-        return render_template("upload.html",
-                               filename=filename,
-                               image_properties=image_properties,
-                               annotated_filename="output.png",
-                               labels=labels)
+        return render_template(
+            "upload.html",
+            filename=filename,
+            image_properties=image_properties,
+            annotated_filename="output.png",
+            labels=labels,
+        )
     else:
         flash("Allowed image types are -> png, jpg, jpeg, gif")
         return redirect(request.url)
@@ -55,7 +55,6 @@ def upload_image():
 
 @app.route("/display/<filename>")
 def display_image(filename):
-    # print('display_image filename: ' + filename)
     return redirect(url_for("static", filename="uploads/" + filename), code=301)
 
 
