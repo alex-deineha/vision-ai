@@ -57,9 +57,12 @@
                     <div class="palette" style="height: 150px; display: flex; flex-direction: row;">
                         {% set total = image_properties|sum(attribute='fraction') %}
                         {% for color_info in image_properties %}
-                        <div style="background-color: {{ color_info.color }}; height: 150px; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
+                        <div data-toggle="tooltip" title="{{ ((color_info.fraction / total) * 100) | round(2) }}%"
+                             style="background-color: {{ color_info.color }}; height: 150px; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
                         {% endfor %}
                     </div>
+
+
                 </div>
                 <div id="annotate" class="tab-pane">
                     <!-- Annotated Image -->
@@ -94,3 +97,11 @@
 </body>
 
 </html>
+
+
+<!-- Initialize Tooltips -->
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
