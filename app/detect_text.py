@@ -1,6 +1,9 @@
 from PIL import Image, ImageDraw
 from google.cloud import vision
 
+service_account_key_file_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/organic-phoenix-387906-f9a188e350aa.json"
+
+
 def draw_boxes(image_path, response):
     # Open the image file
     image = Image.open(image_path)
@@ -13,14 +16,13 @@ def draw_boxes(image_path, response):
             vertices[0].x, vertices[0].y,
             vertices[1].x, vertices[1].y,
             vertices[2].x, vertices[2].y,
-            vertices[3].x, vertices[3].y], outline='green')
+            vertices[3].x, vertices[3].y], outline='green', width=5)
 
     # Save the new image
-    image.save('output.jpg')
+    image.save('/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/output.png')
 
 def analyze_image_properties(path):
     """Analyze image properties in the file."""
-    service_account_key_file_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/organic-phoenix-387906-f9a188e350aa.json"
     client = vision.ImageAnnotatorClient.from_service_account_json(service_account_key_file_path)
 
     with open(path, "rb") as image_file:
@@ -60,7 +62,6 @@ def analyze_image_properties(path):
 
 def detect_text(path):
     """Detects text in the file."""
-    service_account_key_file_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/organic-phoenix-387906-f9a188e350aa.json"
     client = vision.ImageAnnotatorClient.from_service_account_json(service_account_key_file_path)
 
     with open(path, "rb") as image_file:
@@ -92,7 +93,38 @@ def detect_text(path):
         )
 
 
+def detect_labels(path):
+    """Detects labels in the file."""
+    client = vision.ImageAnnotatorClient.from_service_account_json(service_account_key_file_path)
+
+    with open(path, "rb") as image_file:
+        content = image_file.read()
+
+    image = vision.Image(content=content)
+
+    response = client.label_detection(image=image)
+
+    labels = response.label_annotations
+
+
+    print('Labels:')
+    for label in labels:
+        print(label.description)
+        print(label.score)
+
+    if response.error.message:
+        raise Exception(
+            "{}\nFor more info on error messages, check: "
+            "https://cloud.google.com/apis/design/errors".format(response.error.message)
+        )
+
+    return labels
+
+
+
 if __name__ == '__main__':
-    image_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/sample"
+    image_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/7363e8a8-599e-4487-9fc4-2f6263d1a841-image.png"
     detect_text(image_path)
     analyze_image_properties(image_path)
+    detect_labels(image_path)
+

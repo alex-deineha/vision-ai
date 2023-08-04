@@ -3,7 +3,7 @@ from app import app
 from flask import flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 
-from detect_text import analyze_image_properties
+from detect_text import analyze_image_properties, detect_text
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
@@ -36,15 +36,15 @@ def upload_image():
         # print('upload_image filename: ' + filename)
         flash("Image successfully uploaded and displayed below")
 
-        image_properties = [
-            {'color': 'rgb(255,0,0)', 'fraction': 0.25},
-            {'color': 'rgb(0,255,0)', 'fraction': 0.25},
-            {'color': 'rgb(0,0,255)', 'fraction': 0.5},
-        ]
+        detect_text(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         image_properties = analyze_image_properties(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-        return render_template("upload.html", filename=filename, image_properties=image_properties)
+        print(filename)
+        return render_template("upload.html",
+                               filename=filename,
+                               image_properties=image_properties,
+                               annotated_filename="output.png")
     else:
         flash("Allowed image types are -> png, jpg, jpeg, gif")
         return redirect(request.url)

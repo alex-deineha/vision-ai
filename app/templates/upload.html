@@ -26,11 +26,11 @@
         }
         .palette {
             display: flex;
-            height: 50px; /* increased height */
+            height: 50px;
             margin-top: 10px;
         }
         .palette div {
-            height: 50px; /* increased height */
+            height: 50px;
         }
     </style>
 </head>
@@ -51,14 +51,20 @@
             <div class="preview">
                 <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
             </div>
-            <!-- Add description -->
+            <!-- Image Analysis - Step 1: Dominant Colors -->
             <h4>Image Analysis - Step 1: Dominant Colors</h4>
-            <!-- Display image properties as a color palette -->
             <div class="palette">
                 {% set total = image_properties|sum(attribute='fraction') %}
                 {% for color_info in image_properties %}
                     <div style="background-color: {{ color_info.color }}; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
                 {% endfor %}
+            </div>
+            <!-- Image Analysis - Step 2: Text Annotations -->
+            <h4>Image Analysis - Step 2: Text Annotations</h4>
+            <div class="preview">
+                {% if annotated_filename %}
+                    <img src="{{ url_for('display_image', filename=annotated_filename) }}" class="img-thumbnail">
+                {% endif %}
             </div>
         {% endif %}
         <form method="post" action="/" enctype="multipart/form-data">
