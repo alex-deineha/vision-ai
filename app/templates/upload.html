@@ -26,11 +26,11 @@
         }
         .palette {
             display: flex;
-            height: 20px;
+            height: 50px; /* increased height */
             margin-top: 10px;
         }
         .palette div {
-            height: 20px;
+            height: 50px; /* increased height */
         }
     </style>
 </head>
@@ -51,6 +51,8 @@
             <div class="preview">
                 <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
             </div>
+            <!-- Add description -->
+            <h4>Image Analysis - Step 1: Dominant Colors</h4>
             <!-- Display image properties as a color palette -->
             <div class="palette">
                 {% set total = image_properties|sum(attribute='fraction') %}
