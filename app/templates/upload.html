@@ -32,6 +32,25 @@
         .palette div {
             height: 50px;
         }
+        .label-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .label-description {
+            flex: 3;
+            padding-right: 10px;
+        }
+        .score-bar {
+            flex: 7;
+            background-color: #ddd;  /* Bar background color */
+            height: 10px;  /* Adjust the height as needed */
+            overflow: hidden;
+        }
+        .score-bar div {
+            height: 10px;  /* Match height of score bar */
+            background-color: #4CAF50;  /* Fill color */
+        }
     </style>
 </head>
 
@@ -51,20 +70,32 @@
             <div class="preview">
                 <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
             </div>
-            <!-- Image Analysis - Step 1: Dominant Colors -->
-            <h4>Image Analysis - Step 1: Dominant Colors</h4>
+            <!-- Image Analysis - Step 1: Color Analysis -->
+            <h4>Image Analysis - Step 1: Color Analysis</h4>
             <div class="palette">
                 {% set total = image_properties|sum(attribute='fraction') %}
                 {% for color_info in image_properties %}
                     <div style="background-color: {{ color_info.color }}; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
                 {% endfor %}
             </div>
+
             <!-- Image Analysis - Step 2: Text Annotations -->
             <h4>Image Analysis - Step 2: Text Annotations</h4>
             <div class="preview">
                 {% if annotated_filename %}
                     <img src="{{ url_for('display_image', filename=annotated_filename) }}" class="img-thumbnail">
                 {% endif %}
+            </div>
+
+            <!-- Image Analysis - Step 3: Label Detection -->
+            <h4>Image Analysis - Step 3: Label Detection</h4>
+            <div>
+                {% for label in labels %}
+                    <p>{{ label.description }}</p>
+                    <div class="score-bar">
+                        <div style="width: {{ label.score * 100 }}%;"></div>
+                    </div>
+                {% endfor %}
             </div>
         {% endif %}
         <form method="post" action="/" enctype="multipart/form-data">

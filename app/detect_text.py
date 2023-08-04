@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 from google.cloud import vision
 
 service_account_key_file_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/organic-phoenix-387906-f9a188e350aa.json"
+annotated_filename = '/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/output.png'
 
 
 def draw_boxes(image_path, response):
@@ -19,7 +20,8 @@ def draw_boxes(image_path, response):
             vertices[3].x, vertices[3].y], outline='green', width=5)
 
     # Save the new image
-    image.save('/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/output.png')
+    image.save(annotated_filename)
+
 
 def analyze_image_properties(path):
     """Analyze image properties in the file."""
@@ -33,6 +35,21 @@ def analyze_image_properties(path):
     response = client.image_properties(image=image)
     props = response.image_properties_annotation
 
+    print('Properties of the image:')
+
+    for color in props.dominant_colors.colors:
+        print('Fraction: {}'.format(color.pixel_fraction))
+        print('\tR: {}'.format(color.color.red))
+        print('\tG: {}'.format(color.color.green))
+        print('\tB: {}'.format(color.color.blue))
+        print('\tAlpha: {}'.format(color.color.alpha))
+
+    if response.error.message:
+        raise Exception(
+            "{}\nFor more info on error messages, check: "
+            "https://cloud.google.com/apis/design/errors".format(response.error.message)
+        )
+
     # Prepare image properties for HTML
     image_properties = []
     for color_info in props.dominant_colors.colors:
@@ -44,22 +61,6 @@ def analyze_image_properties(path):
     return image_properties
 
 
-    # print('Properties of the image:')
-    #
-    # for color in props.dominant_colors.colors:
-    #     print('Fraction: {}'.format(color.pixel_fraction))
-    #     print('\tR: {}'.format(color.color.red))
-    #     print('\tG: {}'.format(color.color.green))
-    #     print('\tB: {}'.format(color.color.blue))
-    #     print('\tAlpha: {}'.format(color.color.alpha))
-    #
-    # if response.error.message:
-    #     raise Exception(
-    #         "{}\nFor more info on error messages, check: "
-    #         "https://cloud.google.com/apis/design/errors".format(response.error.message)
-    #     )
-
-
 def detect_text(path):
     """Detects text in the file."""
     client = vision.ImageAnnotatorClient.from_service_account_json(service_account_key_file_path)
@@ -69,11 +70,7 @@ def detect_text(path):
 
     image = vision.Image(content=content)
 
-
     response = client.text_detection(image=image)
-    print(response.text_annotations)
-    draw_boxes(path, response)
-
     texts = response.text_annotations
     print("Texts:")
 
@@ -92,6 +89,8 @@ def detect_text(path):
             "https://cloud.google.com/apis/design/errors".format(response.error.message)
         )
 
+    draw_boxes(path, response)
+
 
 def detect_labels(path):
     """Detects labels in the file."""
@@ -105,7 +104,6 @@ def detect_labels(path):
     response = client.label_detection(image=image)
 
     labels = response.label_annotations
-
 
     print('Labels:')
     for label in labels:
@@ -121,10 +119,8 @@ def detect_labels(path):
     return labels
 
 
-
 if __name__ == '__main__':
     image_path = "/Users/alexanderdeineha/PycharmProjects/vision-ai/app/static/uploads/7363e8a8-599e-4487-9fc4-2f6263d1a841-image.png"
     detect_text(image_path)
     analyze_image_properties(image_path)
     detect_labels(image_path)
-
