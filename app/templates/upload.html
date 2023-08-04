@@ -24,6 +24,14 @@
         .preview img {
             max-height: 300px;
         }
+        .palette {
+            display: flex;
+            height: 20px;
+            margin-top: 10px;
+        }
+        .palette div {
+            height: 20px;
+        }
     </style>
 </head>
 
@@ -42,6 +50,13 @@
         {% if filename %}
             <div class="preview">
                 <img src="{{ url_for('display_image', filename=filename) }}" class="img-thumbnail">
+            </div>
+            <!-- Display image properties as a color palette -->
+            <div class="palette">
+                {% set total = image_properties|sum(attribute='fraction') %}
+                {% for color_info in image_properties %}
+                    <div style="background-color: {{ color_info.color }}; width: {{ (color_info.fraction / total) * 100 }}%;"></div>
+                {% endfor %}
             </div>
         {% endif %}
         <form method="post" action="/" enctype="multipart/form-data">

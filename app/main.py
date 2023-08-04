@@ -33,7 +33,14 @@ def upload_image():
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         # print('upload_image filename: ' + filename)
         flash("Image successfully uploaded and displayed below")
-        return render_template("upload.html", filename=filename)
+
+        image_properties = [
+            {'color': 'rgb(255,0,0)', 'fraction': 0.25},
+            {'color': 'rgb(0,255,0)', 'fraction': 0.25},
+            {'color': 'rgb(0,0,255)', 'fraction': 0.5},
+        ]
+
+        return render_template("upload.html", filename=filename, image_properties=image_properties)
     else:
         flash("Allowed image types are -> png, jpg, jpeg, gif")
         return redirect(request.url)
