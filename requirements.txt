@@ -17,3 +17,5 @@ typing-extensions==4.7.1
 Werkzeug==2.3.6
 wheel==0.40.0
 zipp==3.16.2
+Pillow
+google-cloud-vision

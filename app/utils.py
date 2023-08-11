@@ -1,8 +1,9 @@
 from PIL import Image, ImageDraw
 from google.cloud import vision
 
-SERVICE_ACCOUNT_KEY_FILE_PATH = "app/static/organic-phoenix-387906-f9a188e350aa.json"
-ANNOTATED_FILENAME = "app/static/uploads/output.png"
+SERVICE_ACCOUNT_KEY_FILE_PATH = "static/organic-phoenix-387906-f9a188e350aa.json"
+ANNOTATED_FILENAME = "static/uploads/output.png"
+UPLOAD_FOLDER = "static/uploads/"
 
 
 def get_image_and_client(file_path):
